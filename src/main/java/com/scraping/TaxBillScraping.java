@@ -103,16 +103,19 @@ public class TaxBillScraping {
         //[STEP-13] 전자 세금계산서 조회
         ssoMap.put("netFunnelId", netFunnelId);
         ssoMap.put("tin", tin);
-        String taxList = taxService.urlHometaxSchTaxBill(ssoMap, 1);
+        String taxList = taxService.urlHometaxSchTaxBill(ssoMap, 1, "UTEETBDA01");
 
-        //[STEP-14] 세금계산서 xml 파일 다운로드
+        //[STEP-14] 전자 계산서 조회
+        taxList += taxService.urlHometaxSchTaxBill(ssoMap, 1, "UTEETBDA09");
+
+        //[STEP-15] 세금계산서 xml 파일 다운로드
         List<String> taxIssueIdList = taxService.downLoadTaxBillXml(ssoMap, taxList);
 
-        //[STEP-15] 세금계산서 xml 파일 파싱 결과 리턴
+        //[STEP-16] 세금계산서 xml 파일 파싱 결과 리턴
         TaxParsingService taxParsingService = new TaxParsingService(conf.xmlFileDir);
         List<Map<String, Object>> parseXmlList = taxParsingService.parsingTaxXmlFile(taxIssueIdList);
 
-        //[STEP-16] 세금계산서 저장
+        //[STEP-17] 세금계산서 저장
         TaxDataSaveService taxDataSaveService = new TaxDataSaveService();
         taxDataSaveService.saveTaxBill(parseXmlList, conf.url, conf.name, conf.dbPw, conf.driver);
     }
